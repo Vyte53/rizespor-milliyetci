@@ -5,79 +5,208 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rizespor Duvar Kağıdı Tasarımcısı</title>
     <style>
-        body { font-family: sans-serif; background: #222; color: #fff; text-align: center; }
-        .controls { margin: 20px; }
-        .control-group { margin: 10px; display: inline-block; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 { margin-bottom: 5px; font-size: 24px; color: #00aa4f; }
+        p { color: #aaa; margin-top: 0; font-size: 14px; }
         
-        /* Önizleme Alanı (Telefon ekranı oranında, örn: 9:16) */
-        #preview-container {
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 100%;
+        }
+
+        /* Önizleme Alanı - Telefon Ekranı Oranı (9:16) */
+        #preview-wrapper {
+            position: relative;
             width: 360px;
             height: 640px;
-            margin: 0 auto;
-            position: relative;
-            border: 2px solid #555;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border: 3px solid #333;
+            border-radius: 16px;
             overflow: hidden;
-            /* Buraya arka plan deseni CSS ile de bağlanabilir */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            background-color: #1d2363; /* Varsayılan Arka Plan */
+        }
+
+        /* SVG Katmanları */
+        .svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #logo-layer {
+            object-fit: contain;
+            width: 85%;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Kontrol Paneli */
+        .controls {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 340px;
+            box-sizing: border-box;
+        }
+        .control-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        label { font-weight: 500; font-size: 15px; }
+        input[type="color"] {
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
         }
         
-        #logo-svg {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
+        .btn-download {
+            width: 100%;
+            background: #00aa4f;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
         }
+        .btn-download:hover { background: #00883f; }
+        
+        /* Gizli Canvas (İndirme işlemi için) */
+        #download-canvas { display: none; }
     </style>
 </head>
 <body>
 
-    <h1>Tasarımını Özelleştir</h1>
+    <h1>Rizespor Duvar Kağıdı Tasarımcısı</h1>
+    <p>Renkleri seç ve kendi duvar kağıdını yüksek kalitede indir!</p>
     
-    <div class="controls">
-        <div class="control-group">
-            <label>Arka Plan Rengi: </label>
-            <input type="color" id="bgColor" value="#1d2363">
+    <div class="container">
+        <div id="preview-wrapper">
+            <object id="bg-layer" class="svg-layer" data="arka-plan.svg" type="image/svg+xml"></object>
+            <object id="logo-layer" class="svg-layer" data="logo-merkez.svg" type="image/svg+xml"></object>
         </div>
-        <div class="control-group">
-            <label>Motif & Logo Rengi: </label>
-            <input type="color" id="fgColor" value="#ffffff">
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Arka Plan Rengi</label>
+                <input type="color" id="bgColor" value="#1d2363">
+            </div>
+            <div class="control-group">
+                <label>Motif & Logo Rengi</label>
+                <input type="color" id="fgColor" value="#ffffff">
+            </div>
+            <button class="btn-download" id="downloadBtn">Telefon Duvar Kağıdı Yap (PNG)</button>
         </div>
-        <br><br>
-        <button id="downloadBtn" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Görseli İndir</button>
     </div>
 
-    <!-- Önizleme Ekranı -->
-    <div id="preview-container">
-        <!-- Buraya arka plandaki Türk motifinin SVG kodunu gömeceksin -->
-        
-        <!-- Örnek Logo/Bozkurt Alanı (SVG olarak) -->
-        <svg id="logo-svg" viewBox="0 0 100 100">
-            <!-- Vektör çizim yolları (path) buraya gelecek -->
-            <circle cx="50" cy="50" r="40" class="dynamic-fill" />
-        </svg>
-    </div>
+    <canvas id="download-canvas" width="1080" height="1920"></canvas>
 
     <script>
         const bgColorInput = document.getElementById('bgColor');
         const fgColorInput = document.getElementById('fgColor');
-        const previewContainer = document.getElementById('preview-container');
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const bgLayer = document.getElementById('bg-layer');
+        const logoLayer = document.getElementById('logo-layer');
+
+        // Renkleri SVG içerisine enjekte eden fonksiyon
+        function updateColors() {
+            const bgRengi = bgColorInput.value;
+            const fgRengi = fgColorInput.value;
+
+            // Ana arka plan rengini değiştir
+            previewWrapper.style.backgroundColor = bgRengi;
+
+            // Arka plandaki Türk motifinin rengini değiştir (SVG yüklendiyse)
+            try {
+                const bgSvgDoc = bgLayer.getSVGDocument();
+                if (bgSvgDoc) {
+                    // SVG içindeki tüm çizim elementlerini bul ve rengini değiştir
+                    const paths = bgSvgDoc.querySelectorAll('path, polygon, circle, rect');
+                    paths.forEach(p => p.style.fill = fgRengi);
+                }
+            } catch(e) { console.log("SVG henüz tamamen yüklenmedi veya yerel dosya kısıtlaması var."); }
+
+            // Merkez logonun rengini değiştir (SVG yüklendiyse)
+            try {
+                const logoSvgDoc = logoLayer.getSVGDocument();
+                if (logoSvgDoc) {
+                    const paths = logoSvgDoc.querySelectorAll('path, polygon, circle, rect');
+                    paths.forEach(p => p.style.fill = fgRengi);
+                }
+            } catch(e) { }
+        }
+
+        // Renk kutuları değiştikçe tetikle
+        bgColorInput.addEventListener('input', updateColors);
+        fgColorInput.addEventListener('input', updateColors);
         
-        // Renk değişimlerini anlık yansıtma
-        bgColorInput.addEventListener('input', (e) => {
-            previewContainer.style.backgroundColor = e.target.value;
-        });
+        // SVG'ler yüklenir yüklenmez ilk renkleri uygula
+        bgLayer.addEventListener('load', updateColors);
+        logoLayer.addEventListener('load', updateColors);
 
-        fgColorInput.addEventListener('input', (e) => {
-            // SVG içindeki "dynamic-fill" sınıfına sahip tüm ögelerin rengini değiştirir
-            const elements = document.querySelectorAll('.dynamic-fill');
-            elements.forEach(el => el.style.fill = e.target.value);
-        });
-
-        // İndirme fonksiyonu (HTML5 Canvas kullanarak resmi render eder)
+        // İNDİRME BUTONU FONKSİYONU (Yüksek Çözünürlük 1080x1920)
         document.getElementById('downloadBtn').addEventListener('click', () => {
-            // Burada Canvas elementine preview-container'ın içeriği çizilip
-            // canvas.toDataURL("image/png") ile indirme linki tetiklenir.
-            alert('İndirme sistemi tetiklendi! (Canvas entegrasyonu gerekir)');
+            const canvas = document.getElementById('download-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 1. Arka planı boya
+            ctx.fillStyle = bgColorInput.value;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. SVG'leri canvas'a yüksek kalitede çizmek için geçici resim nesneleri oluştur
+            const bgSvgString = new XMLSerializer().serializeToString(bgLayer.getSVGDocument().rootElement);
+            const logoSvgString = new XMLSerializer().serializeToString(logoLayer.getSVGDocument().rootElement);
+
+            const bgImg = new Image();
+            const logoImg = new Image();
+
+            bgImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(bgSvgString);
+            bgImg.onload = function() {
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+                
+                logoImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(logoSvgString);
+                logoImg.onload = function() {
+                    // Logoyu ortala ve canvas boyutuna göre ölçekle (Genişlik: Canvas'ın %85'i)
+                    const logoGenislik = canvas.width * 0.85;
+                    const logoYukseklik = (logoImg.height / logoImg.width) * logoGenislik;
+                    const x = (canvas.width - logoGenislik) / 2;
+                    const y = (canvas.height - logoYukseklik) / 2;
+                    
+                    ctx.drawImage(logoImg, x, y, logoGenislik, logoYukseklik);
+
+                    // İndirme işlemini başlat
+                    const link = document.createElement('a');
+                    link.download = 'rizaspor-duvarkagidi.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+            };
         });
     </script>
 </body>
