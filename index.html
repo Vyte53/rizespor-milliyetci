@@ -134,7 +134,24 @@
         const bgLayer = document.getElementById('bg-layer');
         const logoLayer = document.getElementById('logo-layer');
 
-        // Renkleri SVG içerisine enjekte eden fonksiyon
+        // SVG elemanlarının rengini zorla güncelleyen fonksiyon
+        function applyColorToSvg(svgDoc, color) {
+            if (!svgDoc) return;
+            // SVG içindeki tüm çizim elementlerini seç (path, g, polygon vb.)
+            const elements = svgDoc.querySelectorAll('path, polygon, circle, rect, ellipse, line, polyline, g');
+            elements.forEach(el => {
+                // Eğer elemanın kendisinde veya grubunda dolgu rengi varsa ezmek için:
+                el.style.fill = color;
+                el.setAttribute('fill', color);
+                
+                // Eğer çizgi (stroke) bazlı bir çizimse onun rengini de değiştir
+                if (el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none') {
+                    el.style.stroke = color;
+                    el.setAttribute('stroke', color);
+                }
+            });
+        }
+
         function updateColors() {
             const bgRengi = bgColorInput.value;
             const fgRengi = fgColorInput.value;
@@ -142,23 +159,17 @@
             // Ana arka plan rengini değiştir
             previewWrapper.style.backgroundColor = bgRengi;
 
-            // Arka plandaki Türk motifinin rengini değiştir (SVG yüklendiyse)
+            // Arka plandaki Türk motifinin rengini değiştir
             try {
                 const bgSvgDoc = bgLayer.getSVGDocument();
-                if (bgSvgDoc) {
-                    const paths = bgSvgDoc.querySelectorAll('path, polygon, circle, rect');
-                    paths.forEach(p => p.style.fill = fgRengi);
-                }
-            } catch(e) { console.log("SVG henüz tamamen yüklenmedi veya yerel dosya kısıtlaması var."); }
+                applyColorToSvg(bgSvgDoc, fgRengi);
+            } catch(e) { console.log("Motif SVG erişim hatası:", e); }
 
-            // Merkez logonun rengini değiştir (SVG yüklendiyse)
+            // Merkez logonun rengini değiştir
             try {
                 const logoSvgDoc = logoLayer.getSVGDocument();
-                if (logoSvgDoc) {
-                    const paths = logoSvgDoc.querySelectorAll('path, polygon, circle, rect');
-                    paths.forEach(p => p.style.fill = fgRengi);
-                }
-            } catch(e) { }
+                applyColorToSvg(logoSvgDoc, fgRengi);
+            } catch(e) { console.log("Logo SVG erişim hatası:", e); }
         }
 
         // Renk kutuları değiştikçe tetikle
@@ -174,11 +185,9 @@
             const canvas = document.getElementById('download-canvas');
             const ctx = canvas.getContext('2d');
             
-            // 1. Arka planı boya
             ctx.fillStyle = bgColorInput.value;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 2. SVG'leri canvas'a yüksek kalitede çizmek için geçici resim nesneleri oluştur
             const bgSvgString = new XMLSerializer().serializeToString(bgLayer.getSVGDocument().rootElement);
             const logoSvgString = new XMLSerializer().serializeToString(logoLayer.getSVGDocument().rootElement);
 
@@ -198,9 +207,8 @@
                     
                     ctx.drawImage(logoImg, x, y, logoGenislik, logoYukseklik);
 
-                    // İndirme işlemini başlat
                     const link = document.createElement('a');
-                    link.download = 'rizespor-duvarkagidi.png';
+                    link.download = 'rizaspor-duvarkagidi.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                 };
