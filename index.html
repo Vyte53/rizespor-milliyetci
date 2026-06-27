@@ -87,7 +87,40 @@
             padding-bottom: 5px;
         }
 
-        /* 1. PENCERE: HAZIR KOMBİNASYONLAR */
+        /* ÖZEL RENK SEÇİCİ */
+        .tab-container {
+            display: flex;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: #00aa4f;
+            color: white;
+        }
+
+        .picker-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px;
+        }
+
+        /* HAZIR KOMBİNASYONLAR */
         .presets-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -136,39 +169,6 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
         
-        /* 2. PENCERE: ÖZEL RENK SEÇİCİ */
-        .tab-container {
-            display: flex;
-            background: #2a2a2a;
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-        }
-        .tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #aaa;
-            padding: 8px 0;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: #00aa4f;
-            color: white;
-        }
-
-        .picker-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 180px;
-        }
-        
         .btn-download {
             width: 340px;
             background: #00aa4f;
@@ -191,7 +191,7 @@
 <body>
 
     <h1>Rizespor Duvar Kağıdı Tasarımcısı</h1>
-    <p>İster hazır kombinasyon seç, ister kendi rengini özgürce ayarla!</p>
+    <p>Kendi rengini özgürce ayarla veya aşağıdaki hazır kombinasyonlardan birini seç!</p>
     
     <div class="container">
         <!-- Önizleme -->
@@ -200,9 +200,22 @@
             <object id="bg-layer" class="layer-item" data="motif.svg" type="image/svg+xml"></object>
         </div>
 
-        <!-- PENCERE 1: HAZIR KOMBİNASYONLAR -->
+        <!-- ÜST PENCERE: ÖZEL RENK SEÇİCİ -->
         <div class="panel">
-            <div class="panel-title">1. Hazır Kombinasyonlar</div>
+            <div class="panel-title">1. Kendin Renklendir</div>
+            <div class="tab-container">
+                <button class="tab-btn active" data-target="bgColor">Arka Plan</button>
+                <button class="tab-btn" data-target="motifColor">Motif</button>
+                <button class="tab-btn" data-target="fgColor">Logo</button>
+            </div>
+            <div class="picker-wrapper">
+                <div id="iron-color-picker"></div>
+            </div>
+        </div>
+
+        <!-- ALT PENCERE: HAZIR KOMBİNASYONLAR -->
+        <div class="panel">
+            <div class="panel-title">2. Hazır Kombinasyonlar</div>
             <div class="presets-grid">
                 <button class="preset-btn" data-bg="#1d2363" data-motif="#00aa4f" data-fg="#ffffff">
                     <div class="color-dots">
@@ -350,19 +363,6 @@
             </div>
         </div>
 
-        <!-- PENCERE 2: ÖZEL RENK SEÇİCİ -->
-        <div class="panel">
-            <div class="panel-title">2. Kendin Renklendir</div>
-            <div class="tab-container">
-                <button class="tab-btn active" data-target="bgColor">Arka Plan</button>
-                <button class="tab-btn" data-target="motifColor">Motif</button>
-                <button class="tab-btn" data-target="fgColor">Logo</button>
-            </div>
-            <div class="picker-wrapper">
-                <div id="iron-color-picker"></div>
-            </div>
-        </div>
-
         <!-- İndirme Butonu -->
         <button class="btn-download" id="downloadBtn">4K Duvar Kağıdı İndir (UHD)</button>
     </div>
@@ -505,7 +505,7 @@
 
                     const link = document.createElement('a');
                     link.download = 'rizespor-4k-duvarkagidi.png';
-                    link.href = canvas.toDataURL('image/png');
+                    link.href = canvas.toToDataURL('image/png');
                     link.click();
                 };
             };
