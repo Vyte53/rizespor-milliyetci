@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rizespor Duvar Kağıdı Tasarımcısı</title>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -47,14 +48,12 @@
             pointer-events: none;
         }
 
-        /* Motif artık en altta (z-index: 1) */
         #bg-layer {
             z-index: 1;
             opacity: 0.65;
             object-fit: cover;
         }
 
-        /* Logo artık onun üzerinde (z-index: 2) */
         #logo-layer {
             z-index: 2;
             object-fit: contain;
@@ -75,56 +74,38 @@
             box-sizing: border-box;
         }
         
-        .control-group-vertical {
+        /* Katman Seçim Sekmeleri (Mobilde yer kaplamasın diye) */
+        .tab-container {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 4px;
             margin-bottom: 20px;
         }
-        
-        label { 
-            font-weight: 500; 
-            font-size: 15px; 
-            color: #ccc;
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            padding: 8px 0;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
         }
-        
-        .color-palette {
+        .tab-btn.active {
+            background: #00aa4f;
+            color: white;
+        }
+
+        /* Renk Seçici Tekerlek Alanı */
+        .picker-wrapper {
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        
-        .palette-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: transform 0.1s, border-color 0.1s;
-            padding: 0;
-        }
-        
-        .palette-btn:active, .palette-btn:hover {
-            transform: scale(1.1);
-        }
-        
-        /* Seçili olan butona vurgu yapar */
-        .palette-btn.active {
-            border-color: #00aa4f;
-            box-shadow: 0 0 8px rgba(0, 170, 79, 0.6);
-        }
-        
-        /* Detaylı/Özel renk seçici */
-        input[type="color"] {
-            border: 1px solid #444;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            background: #333;
-            padding: 2px;
-            box-sizing: border-box;
+            margin-bottom: 20px;
+            min-height: 180px;
         }
         
         .btn-download {
@@ -138,18 +119,16 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background 0.2s;
-            margin-top: 10px;
         }
         .btn-download:hover { background: #00883f; }
         
-        /* Arka Plandaki Gizli Tuval (Tam 2160x3840) */
         #download-canvas { display: none; }
     </style>
 </head>
 <body>
 
     <h1>Rizespor Duvar Kağıdı Tasarımcısı</h1>
-    <p>Renk butonlarına dokun ve kendi duvar kağıdını 4K UHD kalitede indir!</p>
+    <p>Değiştirmek istediğin katmanı seç ve renk tekerleğini parmağınla kaydır!</p>
     
     <div class="container">
         <div id="preview-wrapper">
@@ -158,37 +137,14 @@
         </div>
 
         <div class="controls">
-            <div class="control-group-vertical">
-                <label>Arka Plan Rengi</label>
-                <div class="color-palette" data-target="bgColor">
-                    <button class="palette-btn active" style="background: #1d2363;" data-color="#1d2363"></button>
-                    <button class="palette-btn" style="background: #00aa4f;" data-color="#00aa4f"></button>
-                    <button class="palette-btn" style="background: #ffffff; border: 1px solid #444;" data-color="#ffffff"></button>
-                    <button class="palette-btn" style="background: #121212;" data-color="#121212"></button>
-                    <input type="color" id="bgColor" value="#1d2363" title="Özel Renk">
-                </div>
+            <div class="tab-container">
+                <button class="tab-btn active" data-target="bgColor">Arka Plan</button>
+                <button class="tab-btn" data-target="motifColor">Motif</button>
+                <button class="tab-btn" data-target="fgColor">Logo</button>
             </div>
 
-            <div class="control-group-vertical">
-                <label>Motif Rengi</label>
-                <div class="color-palette" data-target="motifColor">
-                    <button class="palette-btn active" style="background: #00aa4f;" data-color="#00aa4f"></button>
-                    <button class="palette-btn" style="background: #1d2363;" data-color="#1d2363"></button>
-                    <button class="palette-btn" style="background: #ffffff; border: 1px solid #444;" data-color="#ffffff"></button>
-                    <button class="palette-btn" style="background: #ffd700;" data-color="#ffd700"></button>
-                    <input type="color" id="motifColor" value="#00aa4f" title="Özel Renk">
-                </div>
-            </div>
-
-            <div class="control-group-vertical">
-                <label>Logo Rengi</label>
-                <div class="color-palette" data-target="fgColor">
-                    <button class="palette-btn active" style="background: #ffffff; border: 1px solid #444;" data-color="#ffffff"></button>
-                    <button class="palette-btn" style="background: #00aa4f;" data-color="#00aa4f"></button>
-                    <button class="palette-btn" style="background: #1d2363;" data-color="#1d2363"></button>
-                    <button class="palette-btn" style="background: #121212;" data-color="#121212"></button>
-                    <input type="color" id="fgColor" value="#ffffff" title="Özel Renk">
-                </div>
+            <div class="picker-wrapper">
+                <div id="iron-color-picker"></div>
             </div>
 
             <button class="btn-download" id="downloadBtn">4K Duvar Kağıdı İndir (UHD)</button>
@@ -198,9 +154,16 @@
     <canvas id="download-canvas" width="2160" height="3840"></canvas>
 
     <script>
-        const bgColorInput = document.getElementById('bgColor');
-        const motifColorInput = document.getElementById('motifColor');
-        const fgColorInput = document.getElementById('fgColor');
+        // Renk değerlerini hafızada tutuyoruz
+        const currentColors = {
+            bgColor: "#1d2363",
+            motifColor: "#00aa4f",
+            fgColor: "#ffffff"
+        };
+
+        // Şu an hangi katmanın renginin seçildiğini tutar (Varsayılan: Arka Plan)
+        let activeLayer = "bgColor";
+
         const previewWrapper = document.getElementById('preview-wrapper');
         const bgLayer = document.getElementById('bg-layer');
         const logoLayer = document.getElementById('logo-layer');
@@ -244,50 +207,49 @@
         }
 
         function updateColors() {
-            previewWrapper.style.backgroundColor = bgColorInput.value;
-            try { applySvgColor(bgLayer.getSVGDocument(), motifColorInput.value); } catch(e) {}
-            try { applySvgColor(logoLayer.getSVGDocument(), fgColorInput.value); } catch(e) {}
+            previewWrapper.style.backgroundColor = currentColors.bgColor;
+            try { applySvgColor(bgLayer.getSVGDocument(), currentColors.motifColor); } catch(e) {}
+            try { applySvgColor(logoLayer.getSVGDocument(), currentColors.fgColor); } catch(e) {}
         }
 
-        bgColorInput.addEventListener('input', updateColors);
-        motifColorInput.addEventListener('input', updateColors);
-        fgColorInput.addEventListener('input', updateColors);
+        // iro.js Renk Tekerleği Kurulumu
+        const colorPicker = new iro.ColorPicker("#iron-color-picker", {
+            width: 170,
+            color: currentColors.bgColor, // ilk açılış rengi
+            layout: [
+                { component: iro.ui.Wheel }, // Yuvarlak renk alanı
+                { component: iro.ui.Slider, options: { sliderType: 'value' } } // Parlaklık ayarı
+            ]
+        });
+
+        // Tekerlek döndürüldükçe çalışacak kod
+        colorPicker.on('color:change', function(color) {
+            currentColors[activeLayer] = color.hexString; // Aktif katmanın rengini güncelle
+            updateColors(); // Tasarımı anlık yenile
+        });
+
+        // Sekme Değiştirme Sistemi (Arka Plan, Motif, Logo arası geçiş)
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Aktif katmanı değiştir ve tekerleğin rengini o katmanın rengine eşitle
+                activeLayer = e.target.getAttribute('data-target');
+                colorPicker.color.hexString = currentColors[activeLayer];
+            });
+        });
+
         bgLayer.addEventListener('load', updateColors);
         logoLayer.addEventListener('load', updateColors);
         window.addEventListener('DOMContentLoaded', updateColors);
-
-        // Hazır palet butonlarına tıklama özelliği
-        document.querySelectorAll('.palette-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const palette = e.target.closest('.color-palette');
-                const targetInputId = palette.getAttribute('data-target');
-                const targetInput = document.getElementById(targetInputId);
-                const selectedColor = e.target.getAttribute('data-color');
-                
-                // Değeri gizli inputa aktar ve tasarımı güncelle
-                targetInput.value = selectedColor;
-                updateColors();
-                
-                // Aktiflik çerçevesini değiştir
-                palette.querySelectorAll('.palette-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-            });
-        });
-
-        // Eğer kullanıcı yine de el ile özel renk seçerse, hazır butonların aktifliğini kaldırır
-        [bgColorInput, motifColorInput, fgColorInput].forEach(input => {
-            input.addEventListener('input', (e) => {
-                e.target.closest('.color-palette').querySelectorAll('.palette-btn').forEach(btn => btn.classList.remove('active'));
-            });
-        });
 
         // 2160x3840 UHD NET ÇIKTI SİSTEMİ
         document.getElementById('downloadBtn').addEventListener('click', () => {
             const canvas = document.getElementById('download-canvas');
             const ctx = canvas.getContext('2d');
             
-            // 1. 4K Arka planı boya
-            ctx.fillStyle = bgColorInput.value;
+            ctx.fillStyle = currentColors.bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const bgSvgString = new XMLSerializer().serializeToString(bgLayer.getSVGDocument().documentElement);
@@ -296,14 +258,12 @@
             const bgImg = new Image();
             const logoImg = new Image();
 
-            // 2. Önce motifi alta çiziyoruz
             bgImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(bgSvgString);
             bgImg.onload = function() {
                 ctx.globalAlpha = 0.65;
                 ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
                 ctx.globalAlpha = 1.0;
 
-                // 3. LOGOYU MOTİFİN ÜZERİNE ÇİZİYORUZ
                 logoImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(logoSvgString);
                 logoImg.onload = function() {
                     const logoGenislik = canvas.width * 0.85;
@@ -313,7 +273,6 @@
                     
                     ctx.drawImage(logoImg, x, y, logoGenislik, logoYukseklik);
 
-                    // 4. İndirmeyi başlat
                     const link = document.createElement('a');
                     link.download = 'rizespor-4k-duvarkagidi.png';
                     link.href = canvas.toDataURL('image/png');
