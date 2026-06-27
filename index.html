@@ -16,7 +16,7 @@
             align-items: center;
         }
         h1 { margin-bottom: 5px; font-size: 24px; color: #00aa4f; }
-        p { color: #aaa; margin-top: 0; font-size: 14px; }
+        p { color: #aaa; margin-top: 0; font-size: 14px; text-align: center; }
         
         .container {
             display: flex;
@@ -47,7 +47,7 @@
             pointer-events: none;
         }
 
-/* Motif artık en altta (z-index: 1) */
+        /* Motif artık en altta (z-index: 1) */
         #bg-layer {
             z-index: 1;
             opacity: 0.65;
@@ -74,20 +74,57 @@
             width: 340px;
             box-sizing: border-box;
         }
-        .control-group {
+        
+        .control-group-vertical {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
         }
-        label { font-weight: 500; font-size: 15px; }
+        
+        label { 
+            font-weight: 500; 
+            font-size: 15px; 
+            color: #ccc;
+        }
+        
+        .color-palette {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .palette-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.1s, border-color 0.1s;
+            padding: 0;
+        }
+        
+        .palette-btn:active, .palette-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Seçili olan butona vurgu yapar */
+        .palette-btn.active {
+            border-color: #00aa4f;
+            box-shadow: 0 0 8px rgba(0, 170, 79, 0.6);
+        }
+        
+        /* Detaylı/Özel renk seçici */
         input[type="color"] {
-            border: none;
-            width: 45px;
-            height: 45px;
+            border: 1px solid #444;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            background: none;
+            background: #333;
+            padding: 2px;
+            box-sizing: border-box;
         }
         
         .btn-download {
@@ -105,14 +142,14 @@
         }
         .btn-download:hover { background: #00883f; }
         
-        /* Arka Plandaki Gizli Tuval (Artık Tam 2160x3840) */
+        /* Arka Plandaki Gizli Tuval (Tam 2160x3840) */
         #download-canvas { display: none; }
     </style>
 </head>
 <body>
 
     <h1>Rizespor Duvar Kağıdı Tasarımcısı</h1>
-    <p>Renkleri seç ve kendi duvar kağıdını 4K UHD kalitede indir!</p>
+    <p>Renk butonlarına dokun ve kendi duvar kağıdını 4K UHD kalitede indir!</p>
     
     <div class="container">
         <div id="preview-wrapper">
@@ -121,18 +158,39 @@
         </div>
 
         <div class="controls">
-            <div class="control-group">
+            <div class="control-group-vertical">
                 <label>Arka Plan Rengi</label>
-                <input type="color" id="bgColor" value="#1d2363">
+                <div class="color-palette" data-target="bgColor">
+                    <button class="palette-btn active" style="background: #1d2363;" data-color="#1d2363"></button>
+                    <button class="palette-btn" style="background: #00aa4f;" data-color="#00aa4f"></button>
+                    <button class="palette-btn" style="background: #ffffff; border: 1px solid #444;" data-color="#ffffff"></button>
+                    <button class="palette-btn" style="background: #121212;" data-color="#121212"></button>
+                    <input type="color" id="bgColor" value="#1d2363" title="Özel Renk">
+                </div>
             </div>
-            <div class="control-group">
+
+            <div class="control-group-vertical">
                 <label>Motif Rengi</label>
-                <input type="color" id="motifColor" value="#00aa4f">
+                <div class="color-palette" data-target="motifColor">
+                    <button class="palette-btn active" style="background: #00aa4f;" data-color="#00aa4f"></button>
+                    <button class="palette-btn" style="background: #1d2363;" data-color="#1d2363"></button>
+                    <button class="palette-btn" style="background: #ffffff; border: 1px solid #444;" data-color="#ffffff"></button>
+                    <button class="palette-btn" style="background: #ffd700;" data-color="#ffd700"></button>
+                    <input type="color" id="motifColor" value="#00aa4f" title="Özel Renk">
+                </div>
             </div>
-            <div class="control-group">
+
+            <div class="control-group-vertical">
                 <label>Logo Rengi</label>
-                <input type="color" id="fgColor" value="#ffffff">
+                <div class="color-palette" data-target="fgColor">
+                    <button class="palette-btn active" style="background: #ffffff; border: 1px solid #444;" data-color="#ffffff"></button>
+                    <button class="palette-btn" style="background: #00aa4f;" data-color="#00aa4f"></button>
+                    <button class="palette-btn" style="background: #1d2363;" data-color="#1d2363"></button>
+                    <button class="palette-btn" style="background: #121212;" data-color="#121212"></button>
+                    <input type="color" id="fgColor" value="#ffffff" title="Özel Renk">
+                </div>
             </div>
+
             <button class="btn-download" id="downloadBtn">4K Duvar Kağıdı İndir (UHD)</button>
         </div>
     </div>
@@ -198,6 +256,31 @@
         logoLayer.addEventListener('load', updateColors);
         window.addEventListener('DOMContentLoaded', updateColors);
 
+        // Hazır palet butonlarına tıklama özelliği
+        document.querySelectorAll('.palette-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const palette = e.target.closest('.color-palette');
+                const targetInputId = palette.getAttribute('data-target');
+                const targetInput = document.getElementById(targetInputId);
+                const selectedColor = e.target.getAttribute('data-color');
+                
+                // Değeri gizli inputa aktar ve tasarımı güncelle
+                targetInput.value = selectedColor;
+                updateColors();
+                
+                // Aktiflik çerçevesini değiştir
+                palette.querySelectorAll('.palette-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        // Eğer kullanıcı yine de el ile özel renk seçerse, hazır butonların aktifliğini kaldırır
+        [bgColorInput, motifColorInput, fgColorInput].forEach(input => {
+            input.addEventListener('input', (e) => {
+                e.target.closest('.color-palette').querySelectorAll('.palette-btn').forEach(btn => btn.classList.remove('active'));
+            });
+        });
+
         // 2160x3840 UHD NET ÇIKTI SİSTEMİ
         document.getElementById('downloadBtn').addEventListener('click', () => {
             const canvas = document.getElementById('download-canvas');
@@ -232,7 +315,7 @@
 
                     // 4. İndirmeyi başlat
                     const link = document.createElement('a');
-                    link.download = 'rizespor-bozkurt-4k-duvarkagidi.png';
+                    link.download = 'rizespor-4k-duvarkagidi.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                 };
