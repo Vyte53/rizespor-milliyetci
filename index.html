@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rizespor Duvar Kağıdı Tasarımcısı</title>
+    <!-- Mobil Dostu Renk Seçici Kütüphanesi -->
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
     <style>
         body {
@@ -64,23 +65,85 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Kontrol Paneli */
-        .controls {
+        /* Ana Kontrol Kutuları */
+        .panel {
             background: #1e1e1e;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             width: 340px;
             box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #00aa4f;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        /* 1. PENCERE: HAZIR KOMBİNASYONLAR */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        /* İnce mobil scrollbar */
+        .presets-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+        .presets-grid::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
         }
         
-        /* Katman Seçim Sekmeleri (Mobilde yer kaplamasın diye) */
+        .preset-btn {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .preset-btn:hover, .preset-btn:active {
+            background: #333;
+            border-color: #555;
+        }
+        .color-dots {
+            display: flex;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* 2. PENCERE: ÖZEL RENK SEÇİCİ */
         .tab-container {
             display: flex;
             background: #2a2a2a;
             border-radius: 8px;
             padding: 4px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
         }
         .tab-btn {
             flex: 1;
@@ -88,7 +151,7 @@
             border: none;
             color: #aaa;
             padding: 8px 0;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             border-radius: 6px;
@@ -99,26 +162,26 @@
             color: white;
         }
 
-        /* Renk Seçici Tekerlek Alanı */
         .picker-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
             min-height: 180px;
         }
         
         .btn-download {
-            width: 100%;
+            width: 340px;
             background: #00aa4f;
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
             transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(0,170,79,0.3);
+            margin-bottom: 20px;
         }
         .btn-download:hover { background: #00883f; }
         
@@ -128,47 +191,199 @@
 <body>
 
     <h1>Rizespor Duvar Kağıdı Tasarımcısı</h1>
-    <p>Değiştirmek istediğin katmanı seç ve renk tekerleğini parmağınla kaydır!</p>
+    <p>İster hazır kombinasyon seç, ister kendi rengini özgürce ayarla!</p>
     
     <div class="container">
+        <!-- Önizleme -->
         <div id="preview-wrapper">
             <object id="logo-layer" class="layer-item" data="logo-merkez.svg" type="image/svg+xml"></object>
             <object id="bg-layer" class="layer-item" data="motif.svg" type="image/svg+xml"></object>
         </div>
 
-        <div class="controls">
+        <!-- PENCERE 1: HAZIR KOMBİNASYONLAR -->
+        <div class="panel">
+            <div class="panel-title">1. Hazır Kombinasyonlar</div>
+            <div class="presets-grid">
+                <button class="preset-btn" data-bg="#1d2363" data-motif="#00aa4f" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #1d2363;"></div>
+                        <div class="dot" style="background: #00aa4f;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Klasik Rize
+                </button>
+                <button class="preset-btn" data-bg="#121212" data-motif="#ffd700" data-fg="#ffd700">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #121212;"></div>
+                        <div class="dot" style="background: #ffd700;"></div>
+                    </div>
+                    Asalet Altın
+                </button>
+                <button class="preset-btn" data-bg="#ffffff" data-motif="#87ceeb" data-fg="#1d2363">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #ffffff;"></div>
+                        <div class="dot" style="background: #87ceeb;"></div>
+                        <div class="dot" style="background: #1d2363;"></div>
+                    </div>
+                    Beyaz & Gökyüzü
+                </button>
+                <button class="preset-btn" data-bg="#556b2f" data-motif="#f5f5dc" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #556b2f;"></div>
+                        <div class="dot" style="background: #f5f5dc;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Zeytin & Bej
+                </button>
+                <button class="preset-btn" data-bg="#f5fffa" data-motif="#98ff98" data-fg="#1e1e1e">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #f5fffa;"></div>
+                        <div class="dot" style="background: #98ff98;"></div>
+                        <div class="dot" style="background: #1e1e1e;"></div>
+                    </div>
+                    Mint & Krem
+                </button>
+                <button class="preset-btn" data-bg="#e0e0e0" data-motif="#ffffff" data-fg="#121212">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #e0e0e0;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                        <div class="dot" style="background: #121212;"></div>
+                    </div>
+                    Gri & Beyaz
+                </button>
+                <button class="preset-btn" data-bg="#1d2363" data-motif="#ff4500" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #1d2363;"></div>
+                        <div class="dot" style="background: #ff4500;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Lacivert & Turuncu
+                </button>
+                <button class="preset-btn" data-bg="#121212" data-motif="#ff0000" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #121212;"></div>
+                        <div class="dot" style="background: #ff0000;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Siyah & Kırmızı
+                </button>
+                <button class="preset-btn" data-bg="#4a2c11" data-motif="#f5f5dc" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #4a2c11;"></div>
+                        <div class="dot" style="background: #f5f5dc;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Krem & Kahve
+                </button>
+                <button class="preset-btn" data-bg="#0b2f1d" data-motif="#ffdb58" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #0b2f1d;"></div>
+                        <div class="dot" style="background: #ffdb58;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Hardal & Orman
+                </button>
+                <button class="preset-btn" data-bg="#ffc0cb" data-motif="#d3d3d3" data-fg="#121212">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #ffc0cb;"></div>
+                        <div class="dot" style="background: #d3d3d3;"></div>
+                        <div class="dot" style="background: #121212;"></div>
+                    </div>
+                    Pudra & Gri
+                </button>
+                <button class="preset-btn" data-bg="#4c0013" data-motif="#004b23" data-fg="#ffd700">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #4c0013;"></div>
+                        <div class="dot" style="background: #004b23;"></div>
+                        <div class="dot" style="background: #ffd700;"></div>
+                    </div>
+                    Bordo & Zümrüt
+                </button>
+                <button class="preset-btn" data-bg="#0047ab" data-motif="#ffcc00" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #0047ab;"></div>
+                        <div class="dot" style="background: #ffcc00;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Kobalt & Sarı
+                </button>
+                <button class="preset-btn" data-bg="#4f4f26" data-motif="#800020" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #4f4f26;"></div>
+                        <div class="dot" style="background: #800020;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Haki & Bordo
+                </button>
+                <button class="preset-btn" data-bg="#008080" data-motif="#ff7f50" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #008080;"></div>
+                        <div class="dot" style="background: #ff7f50;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Mercan & Turkuaz
+                </button>
+                <button class="preset-btn" data-bg="#e6e6fa" data-motif="#98ff98" data-fg="#1d2363">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #e6e6fa;"></div>
+                        <div class="dot" style="background: #98ff98;"></div>
+                        <div class="dot" style="background: #1d2363;"></div>
+                    </div>
+                    Lavanta & Nane
+                </button>
+                <button class="preset-btn" data-bg="#121212" data-motif="#ff69b4" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #121212;"></div>
+                        <div class="dot" style="background: #ff69b4;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Pembe & Siyah
+                </button>
+                <button class="preset-btn" data-bg="#808080" data-motif="#ffdb58" data-fg="#ffffff">
+                    <div class="color-dots">
+                        <div class="dot" style="background: #808080;"></div>
+                        <div class="dot" style="background: #ffdb58;"></div>
+                        <div class="dot" style="background: #ffffff;"></div>
+                    </div>
+                    Hardal & Gri
+                </button>
+            </div>
+        </div>
+
+        <!-- PENCERE 2: ÖZEL RENK SEÇİCİ -->
+        <div class="panel">
+            <div class="panel-title">2. Kendin Renklendir</div>
             <div class="tab-container">
                 <button class="tab-btn active" data-target="bgColor">Arka Plan</button>
                 <button class="tab-btn" data-target="motifColor">Motif</button>
                 <button class="tab-btn" data-target="fgColor">Logo</button>
             </div>
-
             <div class="picker-wrapper">
                 <div id="iron-color-picker"></div>
             </div>
-
-            <button class="btn-download" id="downloadBtn">4K Duvar Kağıdı İndir (UHD)</button>
         </div>
+
+        <!-- İndirme Butonu -->
+        <button class="btn-download" id="downloadBtn">4K Duvar Kağıdı İndir (UHD)</button>
     </div>
 
     <canvas id="download-canvas" width="2160" height="3840"></canvas>
 
     <script>
-        // Renk değerlerini hafızada tutuyoruz
+        // Renk hafızası[cite: 1]
         const currentColors = {
             bgColor: "#1d2363",
             motifColor: "#00aa4f",
             fgColor: "#ffffff"
         };
 
-        // Şu an hangi katmanın renginin seçildiğini tutar (Varsayılan: Arka Plan)
         let activeLayer = "bgColor";
 
         const previewWrapper = document.getElementById('preview-wrapper');
         const bgLayer = document.getElementById('bg-layer');
         const logoLayer = document.getElementById('logo-layer');
 
-        // SVG Renklendirme Filtresi
+        // SVG Renklendirme Filtresi[cite: 1]
         function applySvgColor(svgDoc, colorHex) {
             if (!svgDoc) return;
             
@@ -215,27 +430,42 @@
         // iro.js Renk Tekerleği Kurulumu
         const colorPicker = new iro.ColorPicker("#iron-color-picker", {
             width: 170,
-            color: currentColors.bgColor, // ilk açılış rengi
+            color: currentColors.bgColor,
             layout: [
-                { component: iro.ui.Wheel }, // Yuvarlak renk alanı
-                { component: iro.ui.Slider, options: { sliderType: 'value' } } // Parlaklık ayarı
+                { component: iro.ui.Wheel },
+                { component: iro.ui.Slider, options: { sliderType: 'value' } }
             ]
         });
 
-        // Tekerlek döndürüldükçe çalışacak kod
+        // Tekerlek elle döndürüldüğünde rengi eşitle
         colorPicker.on('color:change', function(color) {
-            currentColors[activeLayer] = color.hexString; // Aktif katmanın rengini güncelle
-            updateColors(); // Tasarımı anlık yenile
+            currentColors[activeLayer] = color.hexString;
+            updateColors();
         });
 
-        // Sekme Değiştirme Sistemi (Arka Plan, Motif, Logo arası geçiş)
+        // Sekme Değiştirme Sistemi
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 
-                // Aktif katmanı değiştir ve tekerleğin rengini o katmanın rengine eşitle
                 activeLayer = e.target.getAttribute('data-target');
+                colorPicker.color.hexString = currentColors[activeLayer];
+            });
+        });
+
+        // HAZIR KOMBİNASYON butonlarına basılınca tetiklenecek kod
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const button = e.currentTarget;
+                
+                currentColors.bgColor = button.getAttribute('data-bg');
+                currentColors.motifColor = button.getAttribute('data-motif');
+                currentColors.fgColor = button.getAttribute('data-fg');
+                
+                updateColors();
+                
+                // Tekerleği de seçili olan aktif sekmenin rengine eşitle
                 colorPicker.color.hexString = currentColors[activeLayer];
             });
         });
@@ -244,7 +474,7 @@
         logoLayer.addEventListener('load', updateColors);
         window.addEventListener('DOMContentLoaded', updateColors);
 
-        // 2160x3840 UHD NET ÇIKTI SİSTEMİ
+        // 2160x3840 UHD NET ÇIKTI SİSTEMİ[cite: 1]
         document.getElementById('downloadBtn').addEventListener('click', () => {
             const canvas = document.getElementById('download-canvas');
             const ctx = canvas.getContext('2d');
